@@ -23,7 +23,14 @@ RC.rtc.updateTile=(member)=>{
   }
   const screenTile=RC.$('peer-screen-'+member.peerId);
   if(member.screen){
-    RC.rtc.createScreenTile(member.peerId,member.name);
+    const nextTile=RC.rtc.createScreenTile(member.peerId,member.name);
+    const peer=RC.state.peers.get(member.peerId);
+    const remoteVideo=nextTile.querySelector('video');
+    if(peer?.screenStream && peer.screenStream.getVideoTracks().length){
+      remoteVideo.srcObject=peer.screenStream;
+      remoteVideo.muted=RC.state.deafened;
+      remoteVideo.play().catch(()=>{});
+    }
   }else if(screenTile){
     screenTile.remove();
   }
@@ -83,8 +90,10 @@ RC.rtc.createPeer=async(peerId,name,initiator=false)=>{
   pc.ontrack=({track,transceiver})=>{
     if(transceiver===screen){
       if(!screenStream.getTracks().some(t=>t.id===track.id))screenStream.addTrack(track);
-      const screenTile=RC.rtc.createScreenTile(peerId,name),video=screenTile.querySelector('video');
-      video.srcObject=screenStream;video.muted=RC.state.deafened;video.play().catch(()=>{});
+      if(RC.state.members.get(peerId)?.screen){
+        const screenTile=RC.rtc.createScreenTile(peerId,name),video=screenTile.querySelector('video');
+        video.srcObject=screenStream;video.muted=RC.state.deafened;video.play().catch(()=>{});
+      }
     }else if(transceiver===camera){
       if(!cameraStream.getTracks().some(t=>t.id===track.id))cameraStream.addTrack(track);
       cameraVideo.srcObject=cameraStream;cameraVideo.play().catch(()=>{});
