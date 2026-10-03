@@ -123,7 +123,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: '64kb' }));
-app.use(express.static(path.join(__dirname, 'public'), {\n  maxAge: '5m',\n  etag: true,\n  setHeaders(res, filePath) {\n    if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-store');\n  }\n}));
+app.get('/', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '5m', etag: true }));
 
 app.get('/api/config', (_req, res) => {
   const iceServers = getIceServers();
