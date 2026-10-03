@@ -120,9 +120,13 @@ RC.media.stopScreen=async()=>{
 };
 
 RC.media.toggleDeafen=()=>{
-  RC.state.deafened=!RC.state.deafened;RC.state.peers.forEach(peer=>{
-    [RC.$('peer-'+peer.peerId),RC.$('peer-screen-'+peer.peerId)].forEach(tile=>{const media=tile?.querySelector('video');if(media)media.muted=RC.state.deafened})
-  });RC.media.updateControls();
+  RC.state.deafened=!RC.state.deafened;
+  RC.state.peers.forEach(peer=>{
+    if(peer.remoteAudio)peer.remoteAudio.muted=RC.state.deafened;
+    const screenVideo=RC.$('peer-screen-'+peer.peerId)?.querySelector('video');
+    if(screenVideo)screenVideo.muted=true;
+  });
+  RC.media.updateControls();
 };
 
 RC.media.toggleAudioOnly=async()=>{
