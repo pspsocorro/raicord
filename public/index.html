@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1e1f22" />
+  <title>RaiCord</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <aside class="server-rail" aria-label="Servidores">
+      <button class="server-icon brand active" title="RaiCord">R</button>
+      <div class="rail-separator"></div>
+      <button class="server-icon">G</button>
+      <button class="server-icon">+</button>
+    </aside>
+
+    <aside class="channel-sidebar">
+      <header class="server-header">
+        <div>
+          <strong id="appName">RaiCord</strong>
+          <span>Comunidade</span>
+        </div>
+        <button class="icon-btn" id="settingsBtn" title="Configurações">⚙</button>
+      </header>
+
+      <div class="channel-scroll">
+        <section class="channel-group">
+          <div class="channel-group-title">CANAIS DE TEXTO</div>
+          <button class="channel text-channel active" data-text-channel="geral">
+            <span>#</span> geral
+          </button>
+          <button class="channel text-channel" data-text-channel="clipes">
+            <span>#</span> clipes
+          </button>
+        </section>
+
+        <section class="channel-group">
+          <div class="channel-group-title">CANAIS DE VOZ</div>
+          <button class="channel voice-channel active" data-room="geral">
+            <span>🔊</span> Geral
+          </button>
+          <button class="channel voice-channel" data-room="gaming">
+            <span>🔊</span> Gaming
+          </button>
+          <button class="channel voice-channel" data-room="musica">
+            <span>🔊</span> Música
+          </button>
+          <button class="channel voice-channel" data-room="privado">
+            <span>🔒</span> Privado
+          </button>
+        </section>
+
+        <section class="connection-card" id="connectionCard">
+          <div class="connection-status">
+            <span class="status-dot"></span>
+            <div>
+              <strong id="connectionText">Desconectado</strong>
+              <small id="roomLabel">Nenhuma sala</small>
+            </div>
+          </div>
+          <button id="leaveBtn" class="danger-mini" title="Desconectar">⏏</button>
+        </section>
+      </div>
+
+      <footer class="user-panel">
+        <div class="avatar" id="localAvatar">P</div>
+        <div class="user-meta">
+          <strong id="localNameLabel">Paulo</strong>
+          <small id="localStateLabel">offline</small>
+        </div>
+        <button id="muteBtnMini" class="icon-btn" title="Microfone">🎙</button>
+        <button id="deafenBtnMini" class="icon-btn" title="Ensurdecer">🎧</button>
+      </footer>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="channel-title">
+          <span>#</span>
+          <strong id="currentChannelTitle">geral</strong>
+          <small>voz, vídeo e compartilhamento no navegador</small>
+        </div>
+        <div class="top-actions">
+          <span class="quality-badge" id="qualityBadge">1080p · 60 FPS</span>
+          <button class="top-icon-btn" id="membersBtn" title="Membros">👥</button>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <section class="stage-section">
+          <div class="stage-toolbar">
+            <div>
+              <strong id="stageTitle">Canal Geral</strong>
+              <small id="stageSubtitle">Entre na sala para começar</small>
+            </div>
+            <div class="toolbar-actions">
+              <select id="qualitySelect" class="compact-select" aria-label="Qualidade da tela">
+                <option value="720p30">720p · 30 FPS</option>
+                <option value="1080p30">1080p · 30 FPS</option>
+                <option value="1080p60" selected>1080p · 60 FPS</option>
+              </select>
+              <button id="audioModeBtn" class="control secondary" title="Modo somente áudio">🎧 Áudio</button>
+            </div>
+          </div>
+
+          <div id="videoGrid" class="video-grid">
+            <article class="video-tile local-tile" id="localTile">
+              <video id="localVideo" autoplay playsinline muted></video>
+              <div class="video-placeholder" id="localPlaceholder">
+                <div class="big-avatar" id="localBigAvatar">P</div>
+              </div>
+              <div class="tile-overlay">
+                <span id="localTileName">Você</span>
+                <div class="tile-status">
+                  <span id="localMicState">🎙</span>
+                  <span id="localCamState">📷</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="empty-stage" id="emptyStage">
+              <div class="empty-illustration">◉</div>
+              <h2>Seu canal de voz, no navegador.</h2>
+              <p>Entre na sala e convide alguém pelo seu domínio. Câmera, microfone e tela funcionam via WebRTC.</p>
+            </article>
+          </div>
+
+          <div class="call-controls">
+            <button id="micBtn" class="round-control active" title="Ativar/desativar microfone">🎙</button>
+            <button id="camBtn" class="round-control" title="Ativar/desativar câmera">📷</button>
+            <button id="screenBtn" class="pill-control" title="Compartilhar tela">🖥 Compartilhar tela</button>
+            <button id="deafenBtn" class="round-control" title="Ensurdecer">🎧</button>
+            <button id="disconnectBtn" class="round-control danger" title="Desconectar">☎</button>
+          </div>
+        </section>
+
+        <aside class="chat-panel">
+          <div class="chat-head">
+            <strong>Chat</strong>
+            <span id="participantCount">1 online</span>
+          </div>
+
+          <div id="messages" class="messages">
+            <div class="system-message">
+              <div class="system-icon">R</div>
+              <div>
+                <strong>Bem-vindo ao RaiCord</strong>
+                <p>Escolha um canal de voz e clique em “Entrar na sala”.</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-form">
+            <input id="messageInput" autocomplete="off" placeholder="Conversar em #geral" maxlength="2000" />
+            <button type="submit">➤</button>
+          </form>
+        </aside>
+      </div>
+    </main>
+
+    <div class="join-overlay" id="joinOverlay">
+      <div class="join-card">
+        <div class="join-logo">R</div>
+        <h1>Entrar no RaiCord</h1>
+        <p>Conecte-se a uma sala de voz diretamente pelo navegador.</p>
+
+        <label>
+          Seu nome
+          <input id="nameInput" value="Paulo" maxlength="32" />
+        </label>
+
+        <label>
+          Sala
+          <input id="roomInput" value="geral" maxlength="64" />
+        </label>
+
+        <div class="join-grid">
+          <label>
+            Microfone
+            <select id="micSelect"></select>
+          </label>
+          <label>
+            Câmera
+            <select id="camSelect"></select>
+          </label>
+        </div>
+
+        <button id="joinBtn" class="primary-join">Entrar na sala</button>
+        <small>O navegador pedirá permissão para microfone/câmera quando necessário.</small>
+      </div>
+    </div>
+
+    <dialog id="settingsDialog" class="settings-dialog">
+      <form method="dialog">
+        <div class="dialog-head">
+          <div>
+            <strong>Configurações de mídia</strong>
+            <small>Selecione seus dispositivos</small>
+          </div>
+          <button class="close-dialog">✕</button>
+        </div>
+
+        <label>
+          Microfone
+          <select id="settingsMicSelect"></select>
+        </label>
+
+        <label>
+          Câmera
+          <select id="settingsCamSelect"></select>
+        </label>
+
+        <div class="setting-row">
+          <div>
+            <strong>Qualidade de compartilhamento</strong>
+            <small>Até 1920×1080 a 60 FPS</small>
+          </div>
+          <select id="settingsQualitySelect">
+            <option value="720p30">720p30</option>
+            <option value="1080p30">1080p30</option>
+            <option value="1080p60" selected>1080p60</option>
+          </select>
+        </div>
+
+        <button id="applySettingsBtn" type="button" class="primary-join">Aplicar</button>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
