@@ -99,7 +99,7 @@ RC.media.toggleMic=async()=>{
 
 RC.media.toggleCamera=async()=>{
   if(!RC.state.cameraEnabled){if(!await RC.media.ensureCamera())return;RC.state.cameraEnabled=true}else RC.state.cameraEnabled=false;
-  await RC.rtc.syncAll();RC.media.updateControls();RC.media.broadcastPresence();
+  await RC.rtc.syncAll();await RC.rtc.renegotiateAll();RC.media.updateControls();RC.media.broadcastPresence();
 };
 
 RC.media.startScreen=async()=>{
@@ -108,7 +108,7 @@ RC.media.startScreen=async()=>{
     const profile=RC.profiles[RC.els.qualitySelect.value]||RC.profiles['1080p60'];
     RC.state.screenStream=await navigator.mediaDevices.getDisplayMedia({video:profile,audio:true});RC.state.screenEnabled=true;
     const track=RC.media.screenVideoTrack();if(track){track.contentHint='detail';try{await track.applyConstraints(profile)}catch{}track.onended=()=>RC.media.stopScreen()}
-    await RC.rtc.syncAll();RC.media.updateControls();RC.media.broadcastPresence();
+    await RC.rtc.syncAll();RC.media.broadcastPresence();await RC.rtc.renegotiateAll();RC.media.updateControls();
     const s=track?.getSettings?.()||{};const label=s.width?s.width+'×'+s.height+(s.frameRate?' · '+Math.round(s.frameRate)+' FPS':''):'ativa';RC.toast('Transmissão de tela '+label+'.');
   }catch(error){if(error.name!=='NotAllowedError')RC.toast('Não consegui iniciar a transmissão de tela.',true)}
 };
@@ -116,7 +116,7 @@ RC.media.startScreen=async()=>{
 RC.media.stopScreen=async()=>{
   if(!RC.state.screenStream)return;const old=RC.state.screenStream;RC.state.screenStream=null;RC.state.screenEnabled=false;
   old.getTracks().forEach(t=>{t.onended=null;try{t.stop()}catch{}});RC.media.clearMixed();
-  await RC.rtc.syncAll();RC.media.updateControls();RC.media.broadcastPresence();
+  await RC.rtc.syncAll();RC.media.broadcastPresence();await RC.rtc.renegotiateAll();RC.media.updateControls();
 };
 
 RC.media.toggleDeafen=()=>{
