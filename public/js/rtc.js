@@ -59,9 +59,17 @@ RC.rtc.configureVideoSender=async(sender,{screen=false}={})=>{
 
 RC.rtc.syncPeer=async(peer,audioTrack=null)=>{
   if(audioTrack===null)audioTrack=await RC.media.outgoingAudioTrack();
+  const cameraTrack=RC.state.cameraEnabled?RC.media.cameraTrack():null;
+  const screenTrack=RC.state.screenEnabled?RC.media.screenVideoTrack():null;
+
   await peer.audio.sender.replaceTrack(audioTrack||null);
-  await peer.camera.sender.replaceTrack(RC.state.cameraEnabled?RC.media.cameraTrack():null);
-  await peer.screen.sender.replaceTrack(RC.state.screenEnabled?RC.media.screenVideoTrack():null);
+  await peer.camera.sender.replaceTrack(cameraTrack||null);
+  await peer.screen.sender.replaceTrack(screenTrack||null);
+
+  peer.audio.direction='sendrecv';
+  peer.camera.direction=cameraTrack?'sendrecv':'recvonly';
+  peer.screen.direction=screenTrack?'sendrecv':'recvonly';
+
   await RC.rtc.configureVideoSender(peer.camera.sender,{screen:false});
   await RC.rtc.configureVideoSender(peer.screen.sender,{screen:true});
 };
@@ -69,6 +77,17 @@ RC.rtc.syncPeer=async(peer,audioTrack=null)=>{
 RC.rtc.syncAll=async()=>{
   const audioTrack=await RC.media.outgoingAudioTrack(true);
   await Promise.all([...RC.state.peers.values()].map(peer=>RC.rtc.syncPeer(peer,audioTrack)));
+};
+
+RC.rtc.renegotiateAll=async()=>{
+  const peers=[...RC.state.peers.values()];
+  for(const peer of peers){
+    if(peer.pc.signalingState==='closed')continue;
+    if(peer.pc.signalingState!=='stable'){
+      await new Promise(resolve=>setTimeout(resolve,120));
+    }
+    await RC.rtc.makeOffer(peer.peerId,false);
+  }
 };
 
 RC.rtc.createPeer=async(peerId,name,initiator=false)=>{
