@@ -3,7 +3,6 @@ RC.media.micTrack=()=>RC.state.micStream?.getAudioTracks?.()[0]||null;
 RC.media.cameraTrack=()=>RC.state.cameraStream?.getVideoTracks?.()[0]||null;
 RC.media.screenVideoTrack=()=>RC.state.screenStream?.getVideoTracks?.()[0]||null;
 RC.media.screenAudioTrack=()=>RC.state.screenStream?.getAudioTracks?.()[0]||null;
-RC.media.currentVideoTrack=()=>RC.state.screenEnabled?RC.media.screenVideoTrack():(RC.state.cameraEnabled?RC.media.cameraTrack():null);
 RC.media.mediaState=()=>({mic:!!RC.media.micTrack()&&RC.state.micEnabled,camera:!!RC.media.cameraTrack()&&RC.state.cameraEnabled,screen:!!RC.media.screenVideoTrack()&&RC.state.screenEnabled});
 
 RC.media.ensureMic=async(force=false)=>{
@@ -51,11 +50,36 @@ RC.media.outgoingAudioTrack=async(force=false)=>{
   RC.state.mixedStream=destination.stream;return destination.stream.getAudioTracks()[0]||mic;
 };
 
+RC.media.ensureLocalScreenTile=()=>{
+  let tile=RC.$('local-screen-tile');
+  if(tile)return tile;
+  tile=document.createElement('article');
+  tile.id='local-screen-tile';
+  tile.className='participant-tile screen';
+  tile.innerHTML='<video autoplay playsinline muted></video><div class="tile-topline"><span class="connection-pill connected">sua tela</span></div><div class="tile-footer"><strong>'+RC.escape(RC.state.name||'Você')+' — Tela</strong><div class="tile-icons"><span>🖥</span></div></div>';
+  RC.els.videoGrid.appendChild(tile);
+  return tile;
+};
+
 RC.media.updateLocalPreview=()=>{
-  const visual=RC.media.currentVideoTrack();RC.els.localVideo.srcObject=visual?new MediaStream([visual]):null;
-  RC.els.localTile.classList.toggle('screen',RC.state.screenEnabled);RC.els.localPlaceholder.classList.toggle('hidden',!!visual);
+  const camera=RC.state.cameraEnabled?RC.media.cameraTrack():null;
+  RC.els.localVideo.srcObject=camera?new MediaStream([camera]):null;
+  RC.els.localTile.classList.remove('screen');
+  RC.els.localPlaceholder.classList.toggle('hidden',!!camera);
   RC.els.localMicIcon.textContent=RC.state.micEnabled&&RC.media.micTrack()?'🎙':'🔇';
-  RC.els.localVideoIcon.textContent=RC.state.screenEnabled?'🖥':RC.state.cameraEnabled?'📷':'🚫';RC.updateEmpty();
+  RC.els.localVideoIcon.textContent=RC.state.cameraEnabled?'📷':'🚫';
+
+  const screen=RC.state.screenEnabled?RC.media.screenVideoTrack():null;
+  let screenTile=RC.$('local-screen-tile');
+  if(screen){
+    screenTile=RC.media.ensureLocalScreenTile();
+    const video=screenTile.querySelector('video');
+    video.srcObject=new MediaStream([screen]);
+    video.play().catch(()=>{});
+  }else if(screenTile){
+    screenTile.remove();
+  }
+  RC.updateEmpty();
 };
 
 RC.media.updateControls=()=>{
@@ -96,7 +120,9 @@ RC.media.stopScreen=async()=>{
 };
 
 RC.media.toggleDeafen=()=>{
-  RC.state.deafened=!RC.state.deafened;RC.state.peers.forEach(peer=>{const media=RC.$('peer-'+peer.peerId)?.querySelector('video');if(media)media.muted=RC.state.deafened});RC.media.updateControls();
+  RC.state.deafened=!RC.state.deafened;RC.state.peers.forEach(peer=>{
+    [RC.$('peer-'+peer.peerId),RC.$('peer-screen-'+peer.peerId)].forEach(tile=>{const media=tile?.querySelector('video');if(media)media.muted=RC.state.deafened})
+  });RC.media.updateControls();
 };
 
 RC.media.toggleAudioOnly=async()=>{
