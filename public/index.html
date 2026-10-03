@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#1e1f22" />
   <meta name="description" content="RaiCord — voz, câmera e compartilhamento de tela em tempo real." />
   <title>RaiCord</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/css/base.css?v=3" />
+  <link rel="stylesheet" href="/css/layout.css?v=3" />
+  <link rel="stylesheet" href="/css/components.css?v=3" />
 </head>
 <body>
   <div class="app-shell">
@@ -19,37 +21,25 @@
 
     <aside class="channel-sidebar">
       <header class="server-header">
-        <div class="server-title-wrap">
-          <strong id="appName">RaiCord</strong>
-          <span>Servidor da galera</span>
-        </div>
+        <div class="server-title-wrap"><strong id="appName">RaiCord</strong><span>Servidor da galera</span></div>
         <button id="copyInviteBtn" class="icon-btn" title="Copiar convite">🔗</button>
       </header>
 
       <div class="channels-scroll">
         <div class="section-title">CANAIS DE TEXTO</div>
-        <button class="channel-row text-channel active" data-text-channel="geral">
-          <span class="hash">#</span><span>geral</span>
-        </button>
-
+        <button class="channel-row active"><span class="hash">#</span><span>geral</span></button>
         <div class="section-title voice-title">CANAIS DE VOZ</div>
         <div id="voiceChannels"></div>
       </div>
 
       <div id="voiceConnection" class="voice-connection hidden">
-        <div class="voice-status-copy">
-          <strong>Voz conectada</strong>
-          <span id="connectedRoomLabel"># geral</span>
-        </div>
+        <div class="voice-status-copy"><strong>Voz conectada</strong><span id="connectedRoomLabel"># geral</span></div>
         <button id="leaveBtn" class="tiny-btn danger" title="Desconectar">⏏</button>
       </div>
 
       <footer class="user-bar">
         <div class="avatar small" id="localAvatar">P</div>
-        <div class="user-copy">
-          <strong id="localNameLabel">Você</strong>
-          <span id="localStatusLabel">offline</span>
-        </div>
+        <div class="user-copy"><strong id="localNameLabel">Você</strong><span id="localStatusLabel">offline</span></div>
         <button id="miniMicBtn" class="icon-btn" title="Microfone">🎙</button>
         <button id="settingsBtn" class="icon-btn" title="Configurações">⚙</button>
       </footer>
@@ -58,9 +48,7 @@
     <main class="main-panel">
       <header class="topbar">
         <div class="topbar-channel">
-          <span class="hash">#</span>
-          <strong id="roomTitle">geral</strong>
-          <span class="divider"></span>
+          <span class="hash">#</span><strong id="roomTitle">geral</strong><span class="divider"></span>
           <small id="roomSubtitle">Entre no canal para conversar</small>
         </div>
         <div class="topbar-actions">
@@ -72,10 +60,7 @@
       <div class="workspace">
         <section class="call-area">
           <div class="call-header">
-            <div>
-              <strong id="callHeading">Canal Geral</strong>
-              <span id="callMeta">0 amigos conectados</span>
-            </div>
+            <div><strong id="callHeading">Canal Geral</strong><span id="callMeta">0 amigos conectados</span></div>
             <div class="quality-actions">
               <select id="qualitySelect" class="select">
                 <option value="720p30">720p · 30 FPS</option>
@@ -89,12 +74,8 @@
           <div id="videoGrid" class="video-grid">
             <article id="localTile" class="participant-tile local">
               <video id="localVideo" autoplay playsinline muted></video>
-              <div id="localPlaceholder" class="tile-placeholder">
-                <div class="avatar huge" id="localBigAvatar">P</div>
-              </div>
-              <div class="tile-topline">
-                <span id="localConnectionBadge" class="connection-pill">você</span>
-              </div>
+              <div id="localPlaceholder" class="tile-placeholder"><div class="avatar huge" id="localBigAvatar">P</div></div>
+              <div class="tile-topline"><span id="localConnectionBadge" class="connection-pill">você</span></div>
               <div class="tile-footer">
                 <strong id="localTileName">Você</strong>
                 <div class="tile-icons"><span id="localMicIcon">🎙</span><span id="localVideoIcon">🚫</span></div>
@@ -102,8 +83,7 @@
             </article>
 
             <div id="emptyCall" class="empty-call">
-              <div class="empty-logo">R</div>
-              <h2>Chame a galera.</h2>
+              <div class="empty-logo">R</div><h2>Chame a galera.</h2>
               <p>Copie o convite e envie para seus amigos. Quem entrar no mesmo canal aparece aqui em tempo real.</p>
               <button id="emptyInviteBtn" class="primary-btn">🔗 Copiar convite</button>
             </div>
@@ -119,30 +99,16 @@
         </section>
 
         <aside id="rightPanel" class="right-panel">
-          <div class="tabs">
-            <button class="tab active" data-tab="members">Membros</button>
-            <button class="tab" data-tab="chat">Chat</button>
-          </div>
-
+          <div class="tabs"><button class="tab active" data-tab="members">Membros</button><button class="tab" data-tab="chat">Chat</button></div>
           <section id="membersTab" class="tab-page active">
             <div class="panel-title">ONLINE — <span id="onlineCount">0</span></div>
             <div id="membersList" class="members-list"></div>
           </section>
-
           <section id="chatTab" class="tab-page chat-page">
             <div id="messages" class="messages">
-              <div class="welcome-message">
-                <div class="avatar medium">R</div>
-                <div>
-                  <h3>Bem-vindo ao RaiCord</h3>
-                  <p>As mensagens e eventos desta sala aparecem aqui em tempo real.</p>
-                </div>
-              </div>
+              <div class="welcome-message"><div class="avatar medium">R</div><div><h3>Bem-vindo ao RaiCord</h3><p>Mensagens e eventos aparecem aqui em tempo real.</p></div></div>
             </div>
-            <form id="chatForm" class="chat-form">
-              <input id="messageInput" maxlength="2000" autocomplete="off" placeholder="Conversar em #geral" />
-              <button type="submit">➤</button>
-            </form>
+            <form id="chatForm" class="chat-form"><input id="messageInput" maxlength="2000" autocomplete="off" placeholder="Conversar em #geral" /><button type="submit">➤</button></form>
           </section>
         </aside>
       </div>
@@ -153,24 +119,16 @@
         <div class="join-brand"><div class="join-logo">R</div><div><strong>RaiCord</strong><span>Entre no servidor</span></div></div>
         <h1>Converse como se estivessem juntos.</h1>
         <p>Áudio, câmera e transmissão de tela diretamente pelo navegador.</p>
-
-        <label class="field-label">SEU NOME
-          <input id="nameInput" maxlength="32" placeholder="Como seus amigos vão te ver" />
-        </label>
+        <label class="field-label">SEU NOME<input id="nameInput" maxlength="32" placeholder="Como seus amigos vão te ver" /></label>
         <label class="field-label">CANAL
-          <select id="joinRoomSelect" class="field-select">
-            <option value="geral">Geral</option>
-            <option value="gaming">Gaming</option>
-            <option value="musica">Música</option>
-            <option value="privado">Privado</option>
-          </select>
+          <select id="joinRoomSelect" class="field-select"><option value="geral">Geral</option><option value="gaming">Gaming</option><option value="musica">Música</option><option value="privado">Privado</option></select>
         </label>
         <div class="join-device-grid">
           <label class="field-label">MICROFONE<select id="micSelect" class="field-select"></select></label>
           <label class="field-label">CÂMERA<select id="camSelect" class="field-select"></select></label>
         </div>
         <button id="joinBtn" class="primary-btn big">Entrar no canal de voz</button>
-        <div id="joinHint" class="join-hint">O navegador vai pedir permissão para usar seu microfone.</div>
+        <div class="join-hint">O navegador vai pedir permissão para usar seu microfone.</div>
       </div>
     </div>
 
@@ -183,11 +141,13 @@
         <button id="applySettingsBtn" type="button" class="primary-btn">Aplicar</button>
       </form>
     </dialog>
-
     <div id="toast" class="toast"></div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js"></script>
+  <script src="/js/core.js?v=3"></script>
+  <script src="/js/media.js?v=3"></script>
+  <script src="/js/rtc.js?v=3"></script>
+  <script src="/js/main.js?v=3"></script>
 </body>
 </html>
