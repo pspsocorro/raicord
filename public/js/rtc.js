@@ -96,18 +96,31 @@ RC.rtc.createPeer=async(peerId,name,initiator=false)=>{
   const audio=pc.addTransceiver('audio',{direction:'sendrecv'});
   const camera=pc.addTransceiver('video',{direction:'sendrecv'});
   const screen=pc.addTransceiver('video',{direction:'sendrecv'});
-  const cameraStream=new MediaStream(),screenStream=new MediaStream();
+  const audioStream=new MediaStream(),cameraStream=new MediaStream(),screenStream=new MediaStream();
   const tile=RC.rtc.createTile(peerId,name),cameraVideo=tile.querySelector('video');
-  cameraVideo.srcObject=cameraStream;cameraVideo.muted=RC.state.deafened;
+  const remoteAudio=document.createElement('audio');
+  remoteAudio.autoplay=true;
+  remoteAudio.playsInline=true;
+  remoteAudio.style.display='none';
+  remoteAudio.id='peer-audio-'+peerId;
+  tile.appendChild(remoteAudio);
+  cameraVideo.srcObject=cameraStream;
+  cameraVideo.muted=true;
+  remoteAudio.srcObject=audioStream;
+  remoteAudio.muted=RC.state.deafened;
 
-  const peer={peerId,name,pc,audio,camera,screen,cameraStream,screenStream,initiator,makingOffer:false,ignoreOffer:false,restartTimer:null};
+  const peer={peerId,name,pc,audio,camera,screen,audioStream,cameraStream,screenStream,remoteAudio,initiator,makingOffer:false,ignoreOffer:false,restartTimer:null};
   RC.state.peers.set(peerId,peer);
 
   pc.onicecandidate=({candidate})=>{if(candidate)RC.socket.emit('signal',{to:peerId,data:{type:'candidate',candidate}})};
   pc.onicecandidateerror=(event)=>console.warn('ICE',event.errorCode,event.errorText,event.url);
 
   pc.ontrack=({track,transceiver})=>{
-    if(transceiver===screen){
+    if(transceiver===audio){
+      if(!audioStream.getTracks().some(t=>t.id===track.id))audioStream.addTrack(track);
+      remoteAudio.srcObject=audioStream;
+      remoteAudio.play().catch(()=>{});
+    }else if(transceiver===screen){
       if(!screenStream.getTracks().some(t=>t.id===track.id))screenStream.addTrack(track);
       if(RC.state.members.get(peerId)?.screen){
         const screenTile=RC.rtc.createScreenTile(peerId,name),video=screenTile.querySelector('video');
@@ -154,6 +167,7 @@ RC.rtc.handleSignal=async({from,name,data})=>{
 
 RC.rtc.closePeer=(peerId)=>{
   const peer=RC.state.peers.get(peerId);if(!peer)return;clearTimeout(peer.restartTimer);try{peer.pc.close()}catch{}
+  try{peer.remoteAudio?.pause()}catch{}
   RC.state.peers.delete(peerId);RC.$('peer-'+peerId)?.remove();RC.$('peer-screen-'+peerId)?.remove();RC.updateEmpty();RC.updateRtcBadge();
 };
 RC.rtc.closeAll=()=>[...RC.state.peers.keys()].forEach(RC.rtc.closePeer);
